@@ -1,0 +1,15 @@
+.git
+.codex
+.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.py[cod]
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+.DS_Store

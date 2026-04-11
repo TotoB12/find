@@ -1,0 +1,50 @@
+services:
+  find:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: find-app
+    restart: unless-stopped
+    environment:
+      DEBUG: ${DEBUG:-0}
+      DB_PATH: /data/find.sqlite
+      PUBLIC_BASE: ${PUBLIC_BASE:-}
+      VIEWER_LABEL: ${VIEWER_LABEL:-Live location}
+      MAPBOX_PUBLIC_TOKEN: ${MAPBOX_PUBLIC_TOKEN:-}
+      MAPBOX_STYLE_URL: ${MAPBOX_STYLE_URL:-mapbox://styles/mapbox/light-v11}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
+      ADMIN_SESSION_TTL_SECONDS: ${ADMIN_SESSION_TTL_SECONDS:-43200}
+      OT_USER: ${OT_USER:?set OT_USER in .env}
+      OT_PASS: ${OT_PASS:?set OT_PASS in .env}
+      OWNTRACKS_ENFORCE_IP: ${OWNTRACKS_ENFORCE_IP:-1}
+      OWNTRACKS_ALLOWED_CIDRS: ${OWNTRACKS_ALLOWED_CIDRS:-100.64.0.0/10,127.0.0.1/32,::1/128}
+      VIEWER_TOKEN_TTL_SECONDS: ${VIEWER_TOKEN_TTL_SECONDS:-600}
+      DEVICE_COOKIE_MAX_AGE_SECONDS: ${DEVICE_COOKIE_MAX_AGE_SECONDS:-31536000}
+    expose:
+      - "8000"
+    ports:
+      - "${APP_BIND_IP:-127.0.0.1}:${APP_PORT:-8000}:8000"
+    volumes:
+      - find_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: find-tunnel
+    restart: unless-stopped
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+    command: tunnel --no-autoupdate run
+    depends_on:
+      find:
+        condition: service_healthy
+
+volumes:
+  find_data:
