@@ -7,7 +7,7 @@ services:
     working_dir: /app
 
     env_file:
-      - .env
+      - /share/Container/find-app/.env
 
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
@@ -15,11 +15,11 @@ services:
       DB_PATH: /data/find.sqlite
 
     ports:
-      - "${APP_BIND_IP:?set APP_BIND_IP in .env}:${APP_PORT:-8000}:8000"
+      - "100.89.191.49:8000:8000"
 
     volumes:
-      - ./app:/app:ro
-      - ./data:/data:rw
+      - /share/Container/find-app/app:/app:ro
+      - /share/Container/find-app/data:/data:rw
 
     command: >
       sh -c "pip install --no-cache-dir -r requirements.txt &&
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
 
     env_file:
-      - .env
+      - /share/Container/find-app/.env
 
     command: tunnel --no-autoupdate run
 
