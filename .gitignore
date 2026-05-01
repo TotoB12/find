@@ -12,3 +12,5 @@ venv/
 *.sqlite-wal
 *.db
 .DS_Store
+data/*
+!data/.gitkeep

@@ -40,7 +40,7 @@ services:
     container_name: find-tunnel
     restart: unless-stopped
     environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN in .env}
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env}
     command: tunnel --no-autoupdate run
     depends_on:
       find:
